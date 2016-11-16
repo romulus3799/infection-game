@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Infection!</title>
+    </head>
+    <body>
+    <style>
+        #instructions {
+            font-size: 14px;
+        }
+        h1 {
+            color:darkgreen;
+            font-family: impact;
+        }
+    </style>
+        <h1>Infection!</h1>
+        <script>
+            var player;
+            var playerSize = 40;
+
+            var point;
+            var pointSize = 30;
+
+            var enemy1;
+            var enemy2;
+            var enemy3;
+            var enemy4;
+
+            var enemySize = 100;
+
+            var wN;
+            var wS;
+            var wW;
+            var wE;
+
+            var lastWall = "";
+
+            var north = "n";
+            var east = "e";
+            var south = "s";
+            var west = "w";
+
+            var nw = "nw";
+            var ne = "ne";
+            var se = "se";
+            var sw = "sw";
+
+            var speedX1 = Math.random()+2;
+            var speedY1 = Math.random()+2;
+            var speedX2 = Math.random()+2;
+            var speedY2 = Math.random()+2;
+            var speedX3 = Math.random()+2;
+            var speedY3 = Math.random()+2;
+            var speedX4 = Math.random()+2;
+            var speedY4 = Math.random()+2;
+            var dir = "";
+
+            var dead = false;
+            var started = false;
+            var time = 0;
+            var score = 0;
+
+            function setup(){
+                createCanvas(500,500);
+                player = createSprite(width/2,height/2,playerSize,playerSize);
+                point = createSprite(width*2/3,height/2,pointSize,pointSize);
+                
+                enemy1 = createSprite(2*width/5,height/5,enemySize,enemySize);
+                enemy2 = createSprite(3*width/5,height/5,enemySize,enemySize);
+                enemy3 = createSprite(2*width/5,4*height/5,enemySize,enemySize);
+                enemy4 = createSprite(3*width/5,4*height/5,enemySize,enemySize);
+                
+                wN = createSprite(width/2,0,width,1);
+                wE = createSprite(width,height/2,1,height);
+                wS = createSprite(width/2,height,width,1);
+                wW = createSprite(0,height/2,1,height);
+                
+                player.onMouseOver = function(){
+                    started = true;
+                }
+                setInterval(function(){
+                if(started)
+                    time += .004; 
+                },1);
+                
+                document.getElementById("refresh").style.visibility = "hidden";
+            }
+
+            function draw(){
+                if(started){
+                    startTime = millis();
+                    enemy1.position.x -= speedX1;
+                    enemy1.position.y -= speedY1;
+                    enemy2.position.x += speedX2;
+                    enemy2.position.y -= speedY2;
+                    enemy3.position.x -= speedX3;
+                    enemy3.position.y += speedY3;
+                    enemy4.position.x += speedX4;
+                    enemy4.position.y += speedY4;
+
+                    player.position.x = pmouseX;
+                    player.position.y = pmouseY;
+                }
+                
+                enemy1.bounce(wN,function(){speedY1 *= -1;});
+                enemy1.bounce(wE,function(){speedX1 *= -1;});
+                enemy1.bounce(wS,function(){speedY1 *= -1;});
+                enemy1.bounce(wW,function(){speedX1 *= -1;});
+                
+                enemy2.bounce(wN,function(){speedY2 *= -1;});
+                enemy2.bounce(wE,function(){speedX2 *= -1;});
+                enemy2.bounce(wS,function(){speedY2 *= -1;});
+                enemy2.bounce(wW,function(){speedX2 *= -1;});
+                
+                enemy3.bounce(wN,function(){speedY3 *= -1;});
+                enemy3.bounce(wE,function(){speedX3 *= -1;});
+                enemy3.bounce(wS,function(){speedY3 *= -1;});
+                enemy3.bounce(wW,function(){speedX3 *= -1;});
+                
+                enemy4.bounce(wN,function(){speedY4 *= -1;});
+                enemy4.bounce(wE,function(){speedX4 *= -1;});
+                enemy4.bounce(wS,function(){speedY4 *= -1;});
+                enemy4.bounce(wW,function(){speedX4 *= -1;});
+                
+                if(player.overlap(enemy1) ||
+                player.overlap(enemy2) ||
+                player.overlap(enemy3) ||
+                player.overlap(enemy4) ||
+                player.overlap(wN) ||
+                player.overlap(wE) ||
+                player.overlap(wS) ||
+                player.overlap(wW))
+                    dead = true;
+                
+                if(player.overlap(point)){
+                    score++;
+                    point.position.x = pointSize + Math.random() * (width - pointSize * 2);
+                    point.position.y = pointSize + Math.random() * (height - pointSize * 2);
+                }
+                
+                if(dead){
+                    gameOver();
+                }
+                
+                background(0,0,100);
+                document.getElementById("time").innerHTML = "Time survived: " + floor(time*1000)/1000;
+                document.getElementById("score").innerHTML = "Points: " + score;
+                
+                text("YOU",player.position.x-(playerSize/2-3),player.position.y-(playerSize/2+5));
+                text("+1 pt",point.position.x-(pointSize/2+3),point.position.y-(pointSize/2+5));
+                
+                text("ENEMY",enemy1.position.x-(enemySize/2),enemy1.position.y-(enemySize/2+5));
+                text("ENEMY",enemy2.position.x-(enemySize/2),enemy2.position.y-(enemySize/2+5));
+                text("ENEMY",enemy3.position.x-(enemySize/2),enemy3.position.y-(enemySize/2+5));
+                text("ENEMY",enemy4.position.x-(enemySize/2),enemy4.position.y-(enemySize/2+5));
+                
+                
+                drawSprites();
+            }
+
+            function gameOver(){
+                document.getElementById("time").innerHTML = "Final Score: " + (Math.round(time+score));
+                document.getElementById("score").style.visibility = "hidden";
+                document.getElementById("refresh").style.visibility = "visible";
+                exit();
+            }
+        </script>
+    <script src="http://rawgit.com/jonleung/33aa8dcb08ce87d689a6/raw/9a3acc3f39ea114aadc1ab87c75f518c553f54ca/p5.js"></script>
+    <script src="http://rawgit.com/jonleung/33aa8dcb08ce87d689a6/raw/9a3acc3f39ea114aadc1ab87c75f518c553f54ca/p5.play.js"></script>
+        <p id="instructions" style="font-family:consolas">The big squares and the walls are infectious! Don't touch them! Collect as many points as you can, and stay alive! Mouse over your square to begin.</p>
+        <p id="time" style="font-family:consolas"></p>
+        <p id="score" style="font-family:consolas"></p>
+        <input type="button" value="Restart" id="refresh" onClick="window.location.reload()" style="font-family:consolas">
+    </body>
+    
+</html>
